@@ -10,7 +10,8 @@ class BreakReason extends Ardent {
 
   protected $fillable = array(
     'code',
-    'reason'
+    'reason',
+    'flag'
   );
 
   protected $guarded  = array();
@@ -27,7 +28,8 @@ class BreakReason extends Ardent {
 
   public static $rules = array(
     'code' => 'required|max:10',
-    'reason' => 'required|max:255'
+    'reason' => 'required|max:255',
+    'flag' => 'required'
   );
 
   // ---------------------------------------------
