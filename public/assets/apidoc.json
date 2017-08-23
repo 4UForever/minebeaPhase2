@@ -1,0 +1,19 @@
+{
+  "name": "Minebea API document",
+  "version": "0.1.0",
+  "description": "An API document for Minebea project",
+  "title": "Minebea API document",
+  "url": "http://staging-minebea.devsenses.net/api",
+  "sampleUrl": "http://test5.test/api",
+  "template": {
+    "withCompare": true,
+    "withGenerator": true
+  },
+  "apidoc": "0.3.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2017-08-18T11:09:37.166Z",
+    "url": "http://apidocjs.com",
+    "version": "0.17.6"
+  }
+}
