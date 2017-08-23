@@ -3,6 +3,8 @@
 /app/storage/documents
 /app/storage/lines
 /app/storage/imports
+/public/apidoc
+/public/assets/doc
 composer.phar
 composer.lock
 .env.*.php

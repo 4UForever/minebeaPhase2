@@ -25,7 +25,9 @@ class AdminProcessLogController extends AdminBaseController
 						"5" => "<input type=\"text\" class=\"column_filter\" data-column=\"5\">",
 						"6" => "<input type=\"text\" class=\"column_filter\" data-column=\"6\">",
 						"7" => "<input type=\"text\" class=\"column_filter\" data-column=\"7\">",
-						"8" => "<input type=\"text\" class=\"column_filter\" data-column=\"8\">"
+						"8" => "<input type=\"text\" class=\"column_filter\" data-column=\"8\">",
+						"9" => "<input type=\"text\" class=\"column_filter\" data-column=\"9\">",
+						"10" => "<input type=\"text\" class=\"column_filter\" data-column=\"10\">"
 					);
 		$datatable = View::make('admins.misc.datatable', compact('id', 'url', 'headers', 'filters'))->render();
 
@@ -99,6 +101,14 @@ class AdminProcessLogController extends AdminBaseController
 		if( !empty($columns[8]['search']['value']) ){//leader
 			$search = $columns[8]['search']['value'];
 			$query->where('line_leader_name', 'LIKE', "%{$search}%");
+		}
+		if( !empty($columns[9]['search']['value']) ){//leader
+			$search = $columns[9]['search']['value'];
+			$query->where('start_time', 'LIKE', "%{$search}%");
+		}
+		if( !empty($columns[10]['search']['value']) ){//leader
+			$search = $columns[10]['search']['value'];
+			$query->where('end_time', 'LIKE', "%{$search}%");
 		}
 
 		$count_query = clone $query;
