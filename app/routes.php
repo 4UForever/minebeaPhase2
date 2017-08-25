@@ -296,6 +296,9 @@ Route::group(array('prefix' => 'admin'), function() {
     Route::get('process-log/test', 'AdminProcessLogController@getTest');
 
     Route::post('process-log/data-table', 'AdminProcessLogController@getDataTable');
+    //phrase 2.1
+    Route::get('report-import', 'AdminPhrase2Controller@reportImport');
+    Route::get('report-daily', 'AdminPhrase2Controller@reportDaily');
   });
   Route::group(array('before' => 'auth.has_access:manage_process_work'), function() {
     Route::get('process-working', 'AdminProcessWorking@getIndex');
@@ -411,6 +414,7 @@ Route::group(array('prefix' => 'api'), function() {
     Route::get('process/get-shift-code', 'ApiPhase2Controller@getShiftCode');
     Route::post('process/model-data', 'ApiPhase2Controller@modelData');//replaced
     Route::post('process/process-break', 'ApiPhase2Controller@processBreak');//replaced
+    Route::post('process/update-ng1', 'ApiPhase2Controller@updateNG1');
   });
 
   // -------------------------------------------------------------------------

@@ -140,9 +140,7 @@ class ApiPhase2Controller extends ApiBaseController {
 			$errors = $this->process_log->errors()->all();
 			return Response::api($errors, 404);
 		}
-
-		$message = "Your request has been successfully submitted.";
-		return Response::api($message, 200, array('process_log_id'=>$this->process_log->id));
+		return Response::api($this->success_msg, 200, array('process_log_id'=>$this->process_log->id));
 	}
 
 	function processBreak(){
@@ -164,6 +162,12 @@ class ApiPhase2Controller extends ApiBaseController {
 			return Response::api("This user does not on any process.", 404);
 		} else {
 			$arr_break = BreakReason::find($break_id);
+			$is_flag = $break->flag;
+			if($is_flag==1){
+				if(empty($break_flag)){
+					return Response::api("You must provide break flag.", 404);
+				}
+			}
 
 			$process_log_break = new ProcessLogBreak;
 			$process_log_break->process_log_id = $arr_user->on_process;
@@ -177,9 +181,20 @@ class ApiPhase2Controller extends ApiBaseController {
 			$process_log = $this->process_log->find($arr_user->on_process);
 			$process_log->on_break = $process_log_break->id;
 			$process_log->save();
+			return Response::api($this->success_msg, 200, array('process_log_break'=>$process_log_break));
+		}
+	}
 
-			$message = "Your request has been successfully received.";
-			return Response::api($message, 200, array('process_log_break'=>$process_log_break));
+	function updateNG1(){
+		$qr_code = Input::post('qr_code');
+		$ng1 = Input::post('ng1');
+		$arr_user = User::where('qr_code', $qr_code)->first(array('id', 'on_process'));
+		if(empty($arr_user->on_process)){
+			return Response::api("This user does not on any process.", 404);
+		} else {
+			$process_log = $this->process_log->find($arr_user->on_process);
+			$process_log->ng1 = $ng1;
+			$process_log->save();
 		}
 	}
 

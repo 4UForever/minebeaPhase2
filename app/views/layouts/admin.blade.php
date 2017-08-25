@@ -154,6 +154,18 @@
                 <span class="glyphicon-class">Process working</span>
               </a>
             </li>
+            <li>
+              <a {{Request::segment(2) == 'report-import' ? 'class="active"' : ''}}  href="{{url("admin/report-import")}}">
+                <span class="glyphicon glyphicon-folder-open"></span>
+                <span class="glyphicon-class">Import data report</span>
+              </a>
+            </li>
+            <li>
+              <a {{Request::segment(2) == 'report-daily' ? 'class="active"' : ''}}  href="{{url("admin/report-daily")}}">
+                <span class="glyphicon glyphicon-book"></span>
+                <span class="glyphicon-class">Report daily</span>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
