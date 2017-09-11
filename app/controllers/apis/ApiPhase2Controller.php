@@ -22,21 +22,19 @@ class ApiPhase2Controller extends ApiBaseController {
 
 	function modelData(){
 		$qr_code = Input::get('qr_code');//8;
+		$working_date = Input::get('working_date');
 		$shift_id = Input::get('shift_id');
 		$line_id = Input::get('line_id');//4;
 		$product_id = Input::get('model_id');//4;
 		$process_id = Input::get('process_id');//10;
-		$dt = Input::get('dt');
-		$setup = Input::get('setup');
 
 		$check_data = array(
 			"qr_code" => $qr_code,
+			"working_date" => $working_date,
 			"shift_id" => $shift_id,
 			"line_id" => $line_id,
 			"model_id" => $product_id,
-			"process_id" => $process_id,
-			"dt" => $dt,
-			"setup" => $setup
+			"process_id" => $process_id
 		);
 		$check_result = $this->check_empty($check_data);
 		if(!empty($check_result)){
@@ -45,7 +43,8 @@ class ApiPhase2Controller extends ApiBaseController {
 
 		$arr_user = User::where('qr_code', $qr_code)->first(array('id', 'email', 'first_name', 'last_name', 'on_process', 'working_process'));
 		if(!empty($arr_user->on_process)){
-			return Response::api("This user is already on process log ID : ".$arr_user->on_process, 409);
+			return Response::api("This user is already on process log ID : ".$arr_user->on_process, 409, array('process_log'=>$arr_user->on_process));
+			// return Response::api("This user is already on process log ID : ".$arr_user->on_process, 409);
 		}
 
 		//Check process relation with user, line, model
@@ -122,11 +121,10 @@ class ApiPhase2Controller extends ApiBaseController {
 		$this->process_log->process_id = $line->processes->first()->id;
 		$this->process_log->process_number = $line->processes->first()->number;
 		$this->process_log->process_title = $line->processes->first()->title;
+		$this->process_log->working_date = $working_date;
 		$this->process_log->shift_id = $shift->id;
 		$this->process_log->shift_label = $shift->label;
 		$this->process_log->shift_time = $shift->time_string;
-		$this->process_log->dt = $dt;
-		$this->process_log->setup = $setup;
 		$this->process_log->wip_id = $wip_sort->id;
 		$this->process_log->wip_sort = $process_sort;
 		// print_r($this->process_log->toArray());
@@ -140,17 +138,37 @@ class ApiPhase2Controller extends ApiBaseController {
 			$errors = $this->process_log->errors()->all();
 			return Response::api($errors, 404);
 		}
-		return Response::api($this->success_msg, 200, array('process_log_id'=>$this->process_log->id));
+		$arr_process_log = $this->process_log;
+		$arr_process_log->model_id = $this->process_log->product_id;
+		$arr_process_log->model_title = $this->process_log->product_title;
+		unset($arr_process_log->product_id);
+		unset($arr_process_log->product_title);
+		return Response::api($this->success_msg, 200, array('process_log'=>$arr_process_log));
 	}
 
-	function processBreak(){
+	function processFinish(){
 		$qr_code = Input::get('qr_code');
-		$break_id = Input::get('break_id');
-		$break_flag = Input::get('break_flag');
+		$start_time = Input::get('start_time');
+		$end_time = Input::get('end_time');
+		$ok_qty = Input::get('ok_qty');
+		$last_serial_no = Input::get('last_serial_no');
+		$setup = Input::get('setup');
+		$dt = Input::get('dt');
+		$remark = Input::get('remark');
+
+		$ngs_json = '[{"ng_id":"1","ng1":"5","ng2":"4"},{"ng_id":"2","ng1":"10","ng2":"5"}]';//trim(Input::get('ngs'));
+		$ngs_arr = json_decode($ngs_json, true);
+		$breaks_json = '[{"break_id":"1","break_flag":"test break flag 1","start_break":"2017-09-08 10:10:00","end_break":"2017-09-08 10:20:00"},{"break_id":"5","break_flag":"test break flag 5","start_break":"2017-09-08 11:10:00","end_break":"2017-09-08 11:20:00"}]';//trim(Input::get('breaks'));
+		$breaks_arr = json_decode($breaks_json, true);
 
 		$check_data = array(
 			"qr_code" => $qr_code,
-			"break_id" => $break_id
+			"start_time" => $start_time,
+			"end_time" => $end_time,
+			"ok_qty" => $ok_qty,
+			"last_serial_no" => $last_serial_no,
+			"setup" => $setup,
+			"dt" => $dt
 		);
 		$check_result = $this->check_empty($check_data);
 		if(!empty($check_result)){
@@ -161,40 +179,87 @@ class ApiPhase2Controller extends ApiBaseController {
 		if(empty($arr_user->on_process)){
 			return Response::api("This user does not on any process.", 404);
 		} else {
-			$arr_break = BreakReason::find($break_id);
-			$is_flag = $break->flag;
-			if($is_flag==1){
-				if(empty($break_flag)){
-					return Response::api("You must provide break flag.", 404);
-				}
+			$process_log = ProcessLog::find($arr_user->on_process);
+			//Check lot
+			$wip_sort = $process_log->wip_sort;
+			$lot = Lot::with(array('processes'=>function($q) use($wip_sort) {
+				$q->where('sort', '<', $wip_sort)->whereNull('qty');
+			}))->find($process_log->lot_id);
+			if(!$lot){
+				return Response::api("This process does not have lot.", 404);
+			}
+			$lot_process_count = $lot->processes->count();
+			if($lot_process_count > 0){
+				return Response::api("Your process order is ".$wip_sort.", There are ".$lot_process_count." processes less your order are running. You can break or contact administrator.", 404);
 			}
 
-			$process_log_break = new ProcessLogBreak;
-			$process_log_break->process_log_id = $arr_user->on_process;
-			$process_log_break->break_id = $arr_break->id;
-			$process_log_break->break_code = $arr_break->code;
-			$process_log_break->break_reason = $arr_break->reason;
-			$process_log_break->break_flag = $break_flag;
-			$process_log_break->start_break = date("Y-m-d H:i:s");
-			$process_log_break->save();
+			if(is_array($ngs_arr) && is_array($breaks_arr)){
+				//Save ng list
+				foreach($ngs_arr as $key_ng=>$ng){
+					$arr_ng = NgDetail::find($ng['ng_id']);
+					$process_log_ng1 = new ProcessLogNg1;
+					$process_log_ng1->process_log_id = $arr_user->on_process;
+					$process_log_ng1->ng_id = $arr_ng->id;
+					$process_log_ng1->ng_title = $arr_ng->title;
+					$process_log_ng1->quantity = $ng['ng1'];
+					$process_log_ng1->save();
+					// print_r($process_log_ng1->toArray());
 
-			$process_log = $this->process_log->find($arr_user->on_process);
-			$process_log->on_break = $process_log_break->id;
-			$process_log->save();
-			return Response::api($this->success_msg, 200, array('process_log_break'=>$process_log_break));
-		}
-	}
+					$process_log_ng = new ProcessLogNg;
+					$process_log_ng->process_log_id = $arr_user->on_process;
+					$process_log_ng->ng_id = $arr_ng->id;
+					$process_log_ng->ng_title = $arr_ng->title;
+					$process_log_ng->quantity = $ng['ng2'];
+					$process_log_ng->save();
+					// print_r($process_log_ng->toArray());
+				}
+				foreach($breaks_arr as $key_break=>$break){
+					$arr_break = BreakReason::find($break['break_id']);
+					$process_log_break = new ProcessLogBreak;
+					$process_log_break->process_log_id = $arr_user->on_process;
+					$process_log_break->break_id = $break['break_id'];
+					$process_log_break->break_code = $arr_break->code;
+					$process_log_break->break_reason = $arr_break->reason;
+					$process_log_break->break_flag = $break['break_flag'];
+					$process_log_break->start_break = $break['start_break'];
+					$process_log_break->end_break = $break['end_break'];
+					$process_log_break->total_minute = round(abs(strtotime($process_log_break->end_break) - strtotime($process_log_break->start_break)) / 60);
+					$process_log_break->save();
+					// print_r($process_log_break->toArray());
+				}
+				$process_log->setup = $setup;
+				$process_log->dt = $dt;
+				$process_log->last_serial_no = $last_serial_no;
+				$process_log->start_time = $start_time;
+				$process_log->end_time = $end_time;
+				$process_log->ok_qty = $ok_qty;
+				$process_log->ng1_qty = ProcessLogNg1::where('process_log_id', $arr_user->on_process)->sum('quantity');
+				$process_log->ng_qty = ProcessLogNg::where('process_log_id', $arr_user->on_process)->sum('quantity');
+				$process_log->total_break = ProcessLogBreak::where('process_log_id', $arr_user->on_process)->sum('total_minute');
+				$process_log->total_minute = round(abs(strtotime($process_log->end_time) - strtotime($process_log->start_time)) / 60);
+				$process_log->remark = $remark;
+				$process_log->save();
+				// print_r($process_log->toArray());
 
-	function updateNG1(){
-		$qr_code = Input::post('qr_code');
-		$ng1 = Input::post('ng1');
-		$arr_user = User::where('qr_code', $qr_code)->first(array('id', 'on_process'));
-		if(empty($arr_user->on_process)){
-			return Response::api("This user does not on any process.", 404);
-		} else {
-			$process_log = $this->process_log->find($arr_user->on_process);
-			$process_log->ng1 = $ng1;
-			$process_log->save();
+				//Update lot
+				DB::table('lot_process')->where('lot_id', $process_log->lot_id)->where('process_id', $process_log->process_id)->where('process_log_id', $process_log->id)->update(array('qty'=>$ok_qty));
+				$wip = Wip::with('processes')->find($process_log->wip_id);
+				if($process_log->wip_sort == $wip->processes->count()){
+					$lot->quantity = $ok_qty;
+					$lot->save();
+				}
+
+				//Clear user process
+				$user = User::find($arr_user->id);
+				$user->on_process = NULL;
+				$user->working_process = NULL;
+				$user->save();
+
+				$message = "Your request has been successfully received.";
+				return Response::api($message, 200, array('process_log'=>$process_log));
+			} else {
+				return Response::api("You must provide ngs, breaks value as valid json format.", 404);
+			}
 		}
 	}
 
