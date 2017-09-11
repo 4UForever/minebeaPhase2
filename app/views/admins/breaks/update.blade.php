@@ -29,6 +29,13 @@
           <input type="text" name="reason" class="form-control" id="reason" placeholder="Enter Break reason title here" value="{{$break->reason}}">
         </div>
         <div class="form-group">
+          <label for="flag">Flag</label>
+          <div class="form-control">
+            <label class="radio-inline"><input type="radio" name="flag" value="1"{{($break->flag=="1")? " checked":"";}}> Yes</label>&nbsp;&nbsp;
+            <label class="radio-inline"><input type="radio" name="flag" value="0"{{($break->flag=="0")? " checked":"";}}> No</label>
+          </div>
+        </div>
+        <div class="form-group">
           <div class="text-center">
             <input type="submit" class="btn btn-success btn-submit" value="SUBMIT">
           </div>

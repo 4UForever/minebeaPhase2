@@ -240,7 +240,7 @@ class ApiProcessLogController extends ApiBaseController {
 
 		$arr_user = User::where('qr_code', $qr_code)->first(array('id', 'email', 'first_name', 'last_name', 'on_process'));
 		if(!empty($arr_user->on_process)){
-			$arr_process_log = ProcessLog::where('id', $arr_user->on_process)->first(array('id', 'user_id', 'user_email', 'line_id', 'line_title', 'product_id as model_id', 'product_title as model_title', 'process_id', 'process_number', 'process_title', 'wip_id', 'wip_sort', 'lot_id', 'lot_number', 'on_break'));
+			$arr_process_log = ProcessLog::where('id', $arr_user->on_process)->first(array('id', 'user_id', 'user_email', 'line_id', 'line_title', 'product_id as model_id', 'product_title as model_title', 'process_id', 'process_number', 'process_title', 'working_date', 'shift_id', 'shift_label', 'shift_time', 'wip_id', 'wip_sort', 'lot_id', 'lot_number', 'on_break'));
 			//print_r($arr_process_log->toArray());
 			if(empty($arr_process_log->lot_id)){
 				$parts = array();
@@ -480,7 +480,7 @@ class ApiProcessLogController extends ApiBaseController {
 			$ng_arr = NgDetail::where('process_id', $arr_process_log->process_id)->get();
 
 			if(! $ng_arr->toArray()){
-				$message = "This process is not have any NG list, Please contact administrator.";
+				$message = "Your working process not have any NG list, Please contact administrator.";
 			} else {
 				$message = "Your request has been successfully received.";
 			}

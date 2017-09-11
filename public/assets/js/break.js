@@ -21,6 +21,7 @@ $(document).ready(function() {
       {'data': 'id'},
       {'data': 'code'},
       {'data': 'reason'},
+      {'data': 'flag'},
       {'data': 'created_at'},
       {'data': 'updated_at'},
       {

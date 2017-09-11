@@ -11,7 +11,7 @@ class AdminBreakReasonController extends AdminBaseController
 	}
 
 	public function getIndex() {
-		$headers = array('<input type="checkbox" id="checkAll">', 'ID', 'Code', 'Reason', 'Created at', 'Updated at', '');
+		$headers = array('<input type="checkbox" id="checkAll">', 'ID', 'Code', 'Reason', 'Flag', 'Created at', 'Updated at', '');
 		$id = 'break';
 		$url = url('admin/break/data-table');
 		$filters = array(
@@ -30,6 +30,7 @@ class AdminBreakReasonController extends AdminBaseController
 	public function postCreate() {
 		$this->break->code = Input::get('code');
 		$this->break->reason = Input::get('reason');
+		$this->break->flag = Input::get('flag');
 
 		if (!$this->break->save()) {
 			$errors = $this->break->errors()->all();
@@ -58,6 +59,7 @@ class AdminBreakReasonController extends AdminBaseController
 
 		$this->break->code = Input::get('code');
 		$this->break->reason = Input::get('reason');
+		$this->break->flag = Input::get('flag');
 
 		if (!$this->break->save()) {
 			$errors = $this->break->errors()->all();
@@ -105,7 +107,7 @@ class AdminBreakReasonController extends AdminBaseController
 
 		$query = $this->break->skip($offset)->take($limit);
 
-		$cols = array('id', 'code', 'reason', 'created_at', 'updated_at',);
+		$cols = array('id', 'code', 'reason', 'flag', 'created_at', 'updated_at',);
 
 		$orders = Input::get('order');
 
@@ -177,15 +179,18 @@ class AdminBreakReasonController extends AdminBaseController
 		foreach($rows as $row=>$col){
 			$code = trim($col[0]);
 			$reason = trim($col[1]);
-			$created_at = (empty($col[2])) ? date("Y-m-d H:i:s"):trim($col[2]);
-			$updated_at = (empty($col[3])) ? date("Y-m-d H:i:s"):trim($col[3]);
+			$flag = (empty($col[2])) ? "0":trim($col[2]);
+			$created_at = (empty($col[3])) ? date("Y-m-d H:i:s"):trim($col[3]);
+			$updated_at = (empty($col[4])) ? date("Y-m-d H:i:s"):trim($col[4]);
 			if( !empty($code) && !empty($reason) ){
 				$break_reason = BreakReason::where('code', $code)->where('reason', $reason)->count();
 				if($break_reason<1){
 					$break_insert = new BreakReason;
 					$break_insert->code = $code;
 					$break_insert->reason = $reason;
+					$break_insert->flag = $flag;
 					$break_insert->created_at = $created_at;
+					$break_insert->updated_at = $updated_at;
 					/*echo "<pre>";
 					print_r($break_insert->toArray());
 					echo "</pre>";*/
@@ -212,6 +217,7 @@ class AdminBreakReasonController extends AdminBaseController
 			$data[$key] = array(
 				'code' => $row->code,
 				'reason' => $row->reason,
+				'flag' => $row->flag,
 				'created_at' => $row->created_at->format('Y-m-d H:i:s'),
 				'updated_at' => $row->updated_at->format('Y-m-d H:i:s')
 			);
@@ -225,7 +231,7 @@ class AdminBreakReasonController extends AdminBaseController
 			$excel->sheet('Sheet 1', function($sheet) use($data) {
 				$sheet->fromArray($data);
 				$sheet->row(1, array(
-					'Code', 'Reason', 'Created at', 'Updated at'
+					'Code', 'Reason', 'Flag', 'Created at', 'Updated at'
 				));
 				$sheet->row(1, function($row) {
 					$row->setFontWeight('bold');

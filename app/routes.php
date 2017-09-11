@@ -400,8 +400,8 @@ Route::group(array('prefix' => 'api'), function() {
 
     //Process log
     Route::post('process/process-start', 'ApiProcessLogController@processStart');
-    Route::post('process/process-finish', 'ApiProcessLogController@processFinish');
-    // Route::post('process/process-break', 'ApiProcessLogController@processBreak');
+    // Route::post('process/process-finish', 'ApiProcessLogController@processFinish');
+    Route::post('process/process-break', 'ApiProcessLogController@processBreak');
     // Route::post('process/model-data', 'ApiProcessLogController@modelData');
     Route::post('process/request-part', 'ApiProcessLogController@requestPartList');
     Route::post('process/keep-first-serial', 'ApiProcessLogController@keepFirstSerial');
@@ -413,8 +413,8 @@ Route::group(array('prefix' => 'api'), function() {
     //--Phase 2.1 Aug 2017
     Route::get('process/get-shift-code', 'ApiPhase2Controller@getShiftCode');
     Route::post('process/model-data', 'ApiPhase2Controller@modelData');//replaced
-    Route::post('process/process-break', 'ApiPhase2Controller@processBreak');//replaced
-    Route::post('process/update-ng1', 'ApiPhase2Controller@updateNG1');
+    // Route::post('process/process-break', 'ApiPhase2Controller@processBreak');//replaced
+    Route::post('process/process-finish', 'ApiPhase2Controller@processFinish');//replaced
   });
 
   // -------------------------------------------------------------------------

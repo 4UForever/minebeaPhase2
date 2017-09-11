@@ -110,6 +110,7 @@ class User extends BaseUser {
     }
 
     $result['models'] = $products;
+    $result['shifts'] = ShiftCode::all();
 
     return $result;
   }
