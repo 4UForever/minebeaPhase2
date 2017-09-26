@@ -225,7 +225,7 @@ class ApiProcessLogController extends ApiBaseController {
 			$process_log->save();
 
 			$message = "Your request has been successfully submitted.";
-			return Response::api($message, 200, array('process_log_id'=>$process_log->id));
+			return Response::api($message, 200, array('process_log'=>$process_log));
 		} else {
 			return Response::api("This user does not on any process ", 404);
 		}

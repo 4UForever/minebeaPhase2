@@ -20,6 +20,150 @@ class ApiPhase2Controller extends ApiBaseController {
 		return Response::api($message, $status, $data);
 	}
 
+	function checkInputLot(){
+		$qr_code = Input::get('qr_code');
+		$parts_json = trim(Input::get('parts'));
+		$wip_lots_json = trim(Input::get('wip_lots'));
+		$parts = json_decode($parts_json, true);
+		$wip_lots = json_decode($wip_lots_json, true);
+		/*
+		$parts = '[{"number":"2222","iqc_lots":[{"number":"iqc001","quantity":10}]}]';
+		$wip_lots = '[{"number":"aa","quantity":"10"},{"number":"dddd","quantity":"20"}]';
+		print_r($parts);
+		print_r($wip_lots);
+		*/
+		if(empty($qr_code)){
+			return Response::api("You must provide qr_code", 404);
+		}
+
+		$arr_user = User::where('qr_code', $qr_code)->first(array('id', 'on_process'));
+		if(empty($arr_user->on_process)){
+			return Response::api("This user does not on any process.", 404);
+		} else {
+			if(is_array($parts)){
+				foreach($parts as $key_part=>$part){
+					$arr_part = Part::where('number', $part['number'])->first(array('id', 'number', 'name'));
+					if(empty($arr_part)){
+						return Response::api("Part number ".$part['number']." does not exists", 404);
+					} else {
+						if(is_array($part['iqc_lots'])){
+							foreach($part['iqc_lots'] as $key_iqc=>$iqc_lot){
+								$arr_iqc = IqcLot::where('part_id', $arr_part->id)->where('number', $iqc_lot['number'])->first(array('id', 'number', 'quantity'));
+								if(empty($arr_iqc)){
+									return Response::api("IQC lot number ".$iqc_lot['number']." does not exists in Part number ".$part['number'], 404);
+								} else {
+									if($arr_iqc['quantity'] < $iqc_lot['quantity']){
+										return Response::api("IQC lot number ".$iqc_lot['number']." has quantity ".$arr_iqc['quantity'], 404);
+									}
+								}
+							}
+						}
+					}
+				}//end foreach parts
+			} else {
+				return Response::api("You must provide parts value as valid json format.", 404);
+			}
+
+			if(is_array($wip_lots)){
+				foreach($wip_lots as $key_wip=>$wip_lot){
+					$arr_wip = Lot::where('number', $wip_lot['number'])->whereNotNull('quantity')->first(array('id', 'number', 'quantity'));
+					if(empty($arr_wip)){
+						return Response::api("WIP lot number ".$wip_lot['number']." does not exists", 404);
+					} else {
+						if($arr_wip['quantity'] < $wip_lot['quantity']){
+							return Response::api("WIP lot number ".$wip_lot['number']." has quantity ".$arr_wip['quantity'], 404);
+						}
+					}
+				}
+			} else {
+				return Response::api("You must provide wip_lots value as valid json format.", 404);
+			}
+		}
+
+		ProcessLogPart::where('process_log_id', $arr_user->on_process)->delete();
+		ProcessLogInput::where('process_log_id', $arr_user->on_process)->delete();
+		if(is_array($parts)){
+			foreach($parts as $key_part=>$part){
+				$arr_part = Part::where('number', $part['number'])->first(array('id', 'number', 'name'));
+
+				$process_log_part = ProcessLogPart::where('process_log_id', $arr_user->on_process)->where('part_id', $arr_part->id)->first();
+				if(empty($process_log_part)){
+					$process_log_part = new ProcessLogPart;
+					$process_log_part->process_log_id = $arr_user->on_process;
+					$process_log_part->part_id = $arr_part->id;
+					$process_log_part->part_number = $arr_part->number;
+					$process_log_part->part_name = $arr_part->name;
+					$process_log_part->save();
+					//print_r($process_log_part->toArray());
+				}
+
+				if(is_array($part['iqc_lots'])){
+					foreach($part['iqc_lots'] as $key_iqc=>$iqc_lot){
+						$arr_iqc = IqcLot::where('number', $iqc_lot['number'])->first(array('id', 'number'));
+
+						$process_log_iqc = ProcessLogInput::where('process_log_id', $arr_user->on_process)->where('lot_type', 'IQC')->where('lot_id', $arr_iqc->id)->first();
+						if(empty($process_log_iqc)){
+							$process_log_iqc = new ProcessLogInput;
+							$process_log_iqc->process_log_id = $arr_user->on_process;
+							$process_log_iqc->part_id = $arr_part->id;
+							$process_log_iqc->lot_type = "IQC";
+							$process_log_iqc->lot_id = $arr_iqc->id;
+							$process_log_iqc->lot_number = $arr_iqc->number;
+							$process_log_iqc->use_qty = $iqc_lot['quantity'];
+							$process_log_iqc->save();
+							//print_r($process_log_iqc->toArray());
+						}
+					}
+				}
+			}//end foreach parts
+		}//end parts
+		if(is_array($wip_lots)){
+			foreach($wip_lots as $key_wip=>$wip_lot){
+				$arr_wip = Lot::where('number', $wip_lot['number'])->first(array('id', 'number'));
+
+				$process_log_wip = ProcessLogInput::where('process_log_id', $arr_user->on_process)->where('lot_type', 'WIP')->where('lot_id', $arr_wip->id)->first();
+				if(empty($process_log_wip)){
+					$process_log_wip = new ProcessLogInput;
+					$process_log_wip->process_log_id = $arr_user->on_process;
+					$process_log_wip->part_id = NULL;
+					$process_log_wip->lot_type = "WIP";
+					$process_log_wip->lot_id = $arr_wip->id;
+					$process_log_wip->lot_number = $arr_wip->number;
+					$process_log_wip->use_qty = $wip_lot['quantity'];
+					$process_log_wip->save();
+					//print_r($process_log_wip->toArray());
+				}
+			}
+		}
+
+		$arr_process_log = ProcessLog::where('id', $arr_user->on_process)->first(array('id', 'user_id', 'user_email', 'line_id', 'line_title', 'product_id as model_id', 'product_title as model_title', 'process_id', 'process_number', 'process_title', 'wip_id', 'wip_sort'));
+		$process_id = $arr_process_log->process_id;
+		if($arr_process_log->wip_sort == 1){
+			$input_lot_number = TRUE;
+			$lot_data = array();
+		} else {
+			$input_lot_number = FALSE;
+			$lot_data = Lot::where('wip_id', $arr_process_log->wip_id)
+				->whereHas('processes', function($q) use($process_id) {
+					$q->where('process_id', $process_id)->whereNull('process_log_id');
+				})
+				->whereNull('quantity')
+				->get();
+			// print_r($lot_data->toArray());
+			foreach($lot_data as $lot){
+				$find_log_id = DB::table('lot_process')->where('lot_id', $lot->id)->where('sort', ($arr_process_log->wip_sort-1))->pluck('process_log_id');
+				$find_last_sn = ProcessLog::where('id', $find_log_id)->first(array('last_serial_no'));
+				// echo "log_id=".$find_log_id." last sn=".$find_last_sn->last_serial_no."<br>";
+				$lot->first_serial_no = (empty($find_last_sn->last_serial_no))? "":strval($find_last_sn->last_serial_no+1);
+			}
+			// print_r($lot_data->toArray());
+		}
+		$lots = array('input_lot_number'=>$input_lot_number, 'lot_data'=>$lot_data);
+
+		$message = "Your request has been successfully received.";
+		return Response::api($message, 200, array('process_log'=>$arr_process_log, 'lots'=>$lots));
+	}
+
 	function modelData(){
 		$qr_code = Input::get('qr_code');//8;
 		$working_date = Input::get('working_date');
@@ -82,7 +226,7 @@ class ApiPhase2Controller extends ApiBaseController {
 				$q->where('process_id', $process_id);
 			})->first();
 		if(empty($wip_sort)){
-			return Response::api("Process id ".$process_id." does not exists in WIP conditions.", 404);
+			return Response::api("Line: ".$line_id.", Model: ".$product_id.", Process id ".$process_id." does not exists in WIP conditions.", 404);
 		}// else { print_r($wip_sort->toArray()); }
 		$process_sort = $wip_sort->processes->first()->pivot->sort;
 
@@ -155,12 +299,12 @@ class ApiPhase2Controller extends ApiBaseController {
 		$setup = Input::get('setup');
 		$dt = Input::get('dt');
 		$remark = Input::get('remark');
+		$wip_qty = Input::get('wip_qty');
 
-		$ngs_json = '[{"ng_id":"1","ng1":"5","ng2":"4"},{"ng_id":"2","ng1":"10","ng2":"5"}]';//trim(Input::get('ngs'));
+		$ngs_json = trim(Input::get('ngs'));//'[{"ng_id":"1","ng1":"5","ng2":"4"},{"ng_id":"2","ng1":"10","ng2":"5"}]';
 		$ngs_arr = json_decode($ngs_json, true);
-		$breaks_json = '[{"break_id":"1","break_flag":"test break flag 1","start_break":"2017-09-08 10:10:00","end_break":"2017-09-08 10:20:00"},{"break_id":"5","break_flag":"test break flag 5","start_break":"2017-09-08 11:10:00","end_break":"2017-09-08 11:20:00"}]';//trim(Input::get('breaks'));
+		$breaks_json = trim(Input::get('breaks'));//'[{"break_id":"1","break_flag":"test break flag 1","start_break":"2017-09-08 10:10:00","end_break":"2017-09-08 10:20:00"},{"break_id":"5","break_flag":"test break flag 5","start_break":"2017-09-08 11:10:00","end_break":"2017-09-08 11:20:00"}]';
 		$breaks_arr = json_decode($breaks_json, true);
-
 		$check_data = array(
 			"qr_code" => $qr_code,
 			"start_time" => $start_time,
@@ -168,7 +312,9 @@ class ApiPhase2Controller extends ApiBaseController {
 			"ok_qty" => $ok_qty,
 			"last_serial_no" => $last_serial_no,
 			"setup" => $setup,
-			"dt" => $dt
+			"dt" => $dt,
+			"ngs" => $ngs_json,
+			"breaks" => $breaks_json
 		);
 		$check_result = $this->check_empty($check_data);
 		if(!empty($check_result)){
@@ -220,7 +366,7 @@ class ApiPhase2Controller extends ApiBaseController {
 					$process_log_break->break_id = $break['break_id'];
 					$process_log_break->break_code = $arr_break->code;
 					$process_log_break->break_reason = $arr_break->reason;
-					$process_log_break->break_flag = $break['break_flag'];
+					$process_log_break->break_flag = empty($break['break_flag'])? "":$break['break_flag'];
 					$process_log_break->start_break = $break['start_break'];
 					$process_log_break->end_break = $break['end_break'];
 					$process_log_break->total_minute = round(abs(strtotime($process_log_break->end_break) - strtotime($process_log_break->start_break)) / 60);
@@ -233,6 +379,7 @@ class ApiPhase2Controller extends ApiBaseController {
 				$process_log->start_time = $start_time;
 				$process_log->end_time = $end_time;
 				$process_log->ok_qty = $ok_qty;
+				$process_log->wip_qty = $wip_qty;
 				$process_log->ng1_qty = ProcessLogNg1::where('process_log_id', $arr_user->on_process)->sum('quantity');
 				$process_log->ng_qty = ProcessLogNg::where('process_log_id', $arr_user->on_process)->sum('quantity');
 				$process_log->total_break = ProcessLogBreak::where('process_log_id', $arr_user->on_process)->sum('total_minute');

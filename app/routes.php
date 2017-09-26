@@ -297,7 +297,14 @@ Route::group(array('prefix' => 'admin'), function() {
 
     Route::post('process-log/data-table', 'AdminProcessLogController@getDataTable');
     //phrase 2.1
-    Route::get('report-import', 'AdminPhrase2Controller@reportImport');
+    Route::get('import-price', 'AdminPhrase2Controller@importPrice');
+    Route::post('import-price', 'AdminPhrase2Controller@postImportPrice');
+    Route::post('import-price-table', 'AdminPhrase2Controller@getDataPrice');
+
+    Route::get('import-target', 'AdminPhrase2Controller@importTarget');
+    Route::post('import-target', 'AdminPhrase2Controller@postImportTarget');
+    Route::post('import-target-table', 'AdminPhrase2Controller@getDataTarget');
+
     Route::get('report-daily', 'AdminPhrase2Controller@reportDaily');
   });
   Route::group(array('before' => 'auth.has_access:manage_process_work'), function() {
@@ -399,22 +406,22 @@ Route::group(array('prefix' => 'api'), function() {
     Route::get('process/process-clear', 'ApiProcessLogController@processClear');
 
     //Process log
-    Route::post('process/process-start', 'ApiProcessLogController@processStart');
+    Route::post('process/process-start', 'ApiProcessLogController@processStart');//cancel on phase2
     // Route::post('process/process-finish', 'ApiProcessLogController@processFinish');
-    Route::post('process/process-break', 'ApiProcessLogController@processBreak');
+    Route::post('process/process-break', 'ApiProcessLogController@processBreak');//cancel on phase2
     // Route::post('process/model-data', 'ApiProcessLogController@modelData');
     Route::post('process/request-part', 'ApiProcessLogController@requestPartList');
     Route::post('process/keep-first-serial', 'ApiProcessLogController@keepFirstSerial');
     Route::post('process/recover-work-status', 'ApiProcessLogController@recoverWorkingStatus');
     Route::post('process/check-iqc-lot', 'ApiProcessLogController@checkIqcLot');
     Route::post('process/check-wip-lot', 'ApiProcessLogController@checkWipLot');
-    Route::post('process/check-input-lot', 'ApiProcessLogController@checkInputLot');
+    // Route::post('process/check-input-lot', 'ApiProcessLogController@checkInputLot');
 
     //--Phase 2.1 Aug 2017
     Route::get('process/get-shift-code', 'ApiPhase2Controller@getShiftCode');
     Route::post('process/model-data', 'ApiPhase2Controller@modelData');//replaced
-    // Route::post('process/process-break', 'ApiPhase2Controller@processBreak');//replaced
     Route::post('process/process-finish', 'ApiPhase2Controller@processFinish');//replaced
+    Route::post('process/check-input-lot', 'ApiPhase2Controller@checkInputLot');//replaced
   });
 
   // -------------------------------------------------------------------------

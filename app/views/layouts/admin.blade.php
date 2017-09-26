@@ -155,9 +155,15 @@
               </a>
             </li>
             <li>
-              <a {{Request::segment(2) == 'report-import' ? 'class="active"' : ''}}  href="{{url("admin/report-import")}}">
+              <a {{Request::segment(2) == 'import-price' ? 'class="active"' : ''}}  href="{{url("admin/import-price")}}">
                 <span class="glyphicon glyphicon-folder-open"></span>
-                <span class="glyphicon-class">Import data report</span>
+                <span class="glyphicon-class">Import Price</span>
+              </a>
+            </li>
+            <li>
+              <a {{Request::segment(2) == 'import-target' ? 'class="active"' : ''}}  href="{{url("admin/import-target")}}">
+                <span class="glyphicon glyphicon-folder-open"></span>
+                <span class="glyphicon-class">Import Target PC</span>
               </a>
             </li>
             <li>
