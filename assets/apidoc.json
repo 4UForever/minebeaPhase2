@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "An API document for Minebea project",
   "title": "Minebea API document",
-  "url": "http://staging-minebea.devsenses.net/api",
-  "sampleUrl": "http://test5.test/api",
+  "url": "http://dev-minebea.devsenses.net/api",
+  "sampleUrl": "http://dev-minebea.devsenses.net/api",
   "template": {
     "withCompare": true,
     "withGenerator": true

@@ -303,7 +303,8 @@ span#end-date-icon {
 
 /*=============== User login ==============*/
 .user-body {
-  background: #14668C url(../images/signin-bg.jpg) no-repeat center center;
+   background-color: #add8e6;
+  /*background: #14668C url(../images/signin-bg.jpg) no-repeat center center;*/
 }
 
 .user-container {

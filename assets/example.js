@@ -161,7 +161,7 @@
 }
 */
 /**
-@api {get} process/ng-list Get NG list
+@api {get} /process/ng-list Get NG list
 @apiVersion 0.1.0
 @apiDescription Get NG list
 @apiName GetNG
@@ -202,7 +202,7 @@
 */
 
 /**
-@api {get} user/login Login
+@api {get} /user/login Login
 @apiVersion 0.1.0
 @apiDescription Login with QR code
 @apiName PostLogin
@@ -427,7 +427,7 @@
 */
 
 /**
-@api {post} process/finish Finish process
+@api {post} /process/process-finish Finish process
 @apiVersion 0.1.0
 @apiDescription Finish process, keep finish data when process finish
 @apiName PostFinish
@@ -457,7 +457,9 @@
             "setup": 2,
             "dt": 4,
             "start_time": "2017-09-11 10:00:00",
-            "end_time": "2017-09-11 12:00:00"
+            "end_time": "2017-09-11 12:00:00",
+            "ngs": "[{\"ng_id\":\"1\",\"ng1\":\"5\",\"ng2\":\"4\"},{\"ng_id\":\"2\",\"ng1\":\"10\",\"ng2\":\"5\"}]",
+            "breaks": "[{\"break_id\":\"1\",\"break_flag\":\"test break flag 1\",\"start_break\":\"2017-09-08 10:10:00\",\"end_break\":\"2017-09-08 10:20:00\"},{\"break_id\":\"5\",\"break_flag\":\"test break flag 5\",\"start_break\":\"2017-09-08 11:10:00\",\"end_break\":\"2017-09-08 11:20:00\"}]"
         },
         "success": "Your request has been successfully received.",
         "errors": null,

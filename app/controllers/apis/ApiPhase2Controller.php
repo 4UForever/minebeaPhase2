@@ -152,9 +152,9 @@ class ApiPhase2Controller extends ApiBaseController {
 			// print_r($lot_data->toArray());
 			foreach($lot_data as $lot){
 				$find_log_id = DB::table('lot_process')->where('lot_id', $lot->id)->where('sort', ($arr_process_log->wip_sort-1))->pluck('process_log_id');
-				$find_last_sn = ProcessLog::where('id', $find_log_id)->first(array('last_serial_no'));
-				// echo "log_id=".$find_log_id." last sn=".$find_last_sn->last_serial_no."<br>";
-				$lot->first_serial_no = (empty($find_last_sn->last_serial_no))? "":strval($find_last_sn->last_serial_no+1);
+				$find_first_sn = ProcessLog::where('id', $find_log_id)->first(array('first_serial_no'));
+				// echo "log_id=".$find_log_id." last sn=".$find_first_sn->first_serial_no."<br>";
+				$lot->first_serial_no = (empty($find_first_sn->first_serial_no))? "":strval($find_first_sn->first_serial_no);
 			}
 			// print_r($lot_data->toArray());
 		}

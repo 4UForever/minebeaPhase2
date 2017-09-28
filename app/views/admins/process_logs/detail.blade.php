@@ -42,6 +42,14 @@
         <p class="col-sm-9">{{$process_log->full_name}}</p>
       </div>
       <div class="row">
+        <label class="col-sm-3">Working date</label>
+        <p class="col-sm-9">{{$process_log->working_date}}</p>
+      </div>
+      <div class="row">
+        <label class="col-sm-3">Shift</label>
+        <p class="col-sm-9">{{$process_log->shift_label}} {{$process_log->shift_time}}</p>
+      </div>
+      <div class="row">
         <label class="col-sm-3">Line</label>
         <p class="col-sm-9">{{$process_log->line_title}}</p>
       </div>
@@ -138,6 +146,18 @@
       <div class="row">
         <label class="col-sm-3">Last serial number</label>
         <p class="col-sm-9">{{$process_log->last_serial_no}}</p>
+      </div>
+      <div class="row">
+        <label class="col-sm-3">Setup</label>
+        <p class="col-sm-9">{{$process_log->setup}}</p>
+      </div>
+      <div class="row">
+        <label class="col-sm-3">D/T</label>
+        <p class="col-sm-9">{{$process_log->dt}}</p>
+      </div>
+      <div class="row">
+        <label class="col-sm-3">Wip Quantity</label>
+        <p class="col-sm-9">{{$process_log->wip_qty}}</p>
       </div>
       <div class="row">
         <label class="col-sm-3">Running time</label>
