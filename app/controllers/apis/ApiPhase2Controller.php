@@ -151,10 +151,11 @@ class ApiPhase2Controller extends ApiBaseController {
 				->get();
 			// print_r($lot_data->toArray());
 			foreach($lot_data as $lot){
-				$find_log_id = DB::table('lot_process')->where('lot_id', $lot->id)->where('sort', ($arr_process_log->wip_sort-1))->pluck('process_log_id');
-				$find_first_sn = ProcessLog::where('id', $find_log_id)->first(array('first_serial_no'));
-				// echo "log_id=".$find_log_id." last sn=".$find_first_sn->first_serial_no."<br>";
-				$lot->first_serial_no = (empty($find_first_sn->first_serial_no))? "":strval($find_first_sn->first_serial_no);
+				$find_log_id = DB::table('lot_process')->where('lot_id', $lot->id)->where('sort', '1')->pluck('process_log_id');
+				$find_process_log = ProcessLog::where('id', $find_log_id)->first(array('first_serial_no', 'last_serial_no'));
+				// echo "log_id=".$find_log_id." last sn=".$find_process_log->first_serial_no."<br>";
+				$lot->first_serial_no = (empty($find_process_log->first_serial_no))? "":strval($find_process_log->first_serial_no);
+				$lot->last_serial_no = (empty($find_process_log->last_serial_no))? "":strval($find_process_log->last_serial_no);
 			}
 			// print_r($lot_data->toArray());
 		}
@@ -379,7 +380,7 @@ class ApiPhase2Controller extends ApiBaseController {
 				$process_log->start_time = $start_time;
 				$process_log->end_time = $end_time;
 				$process_log->ok_qty = $ok_qty;
-				$process_log->wip_qty = $wip_qty;
+				$process_log->wip_qty = empty($wip_qty)? null:$wip_qty;
 				$process_log->ng1_qty = ProcessLogNg1::where('process_log_id', $arr_user->on_process)->sum('quantity');
 				$process_log->ng_qty = ProcessLogNg::where('process_log_id', $arr_user->on_process)->sum('quantity');
 				$process_log->total_break = ProcessLogBreak::where('process_log_id', $arr_user->on_process)->sum('total_minute');
