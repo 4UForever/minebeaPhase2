@@ -415,7 +415,7 @@ class ApiPhase2Controller extends ApiBaseController {
 		//use format $data = array("qr_code"=>$qr_code);
 		foreach($data as $key=>$value){
 			if(!empty($key)){
-				if(empty($value)) return "You must provide ".$key;
+				if(isset($value)) return "You must provide ".$key;
 			}
 		}
 	}
