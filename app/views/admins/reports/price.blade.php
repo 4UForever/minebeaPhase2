@@ -22,7 +22,7 @@
       <h3>
         <span class="glyphicon glyphicon-folder-close"></span>
         <span class="glyphicon-class">
-          Import Circle time &amp; Unit price
+          Import Cycle time &amp; Unit price
         </span>
       </h3>
     </div>
@@ -31,8 +31,8 @@
 <div class="row">
   <div class="col-xs-12">
     <ul class="nav nav-tabs">
-      <li class="active"><a data-toggle="tab" href="#tab1">Data Circle time &amp; Unit price</a></li>
-      <li><a data-toggle="tab" href="#tab2">Import Circle time &amp; Unit price</a></li>
+      <li class="active"><a data-toggle="tab" href="#tab1">Data Cycle time &amp; Unit price</a></li>
+      <li><a data-toggle="tab" href="#tab2">Import Cycle time &amp; Unit price</a></li>
     </ul>
     <div class="tab-content">
       <div id="tab1" class="tab-pane in active">

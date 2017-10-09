@@ -186,28 +186,31 @@ class AdminProcessLogController extends AdminBaseController
 				'process_number' => $row->process_number,
 				'process_title' => $row->process_title,
 				'product_title' => $row->product_title,
+				'working_date' => $row->working_date,
+				'shift_time' => $row->shift_time,
 				'lot_number' => $row->lot_number,
 				'line_leader_name' => $row->line_leader_name,
 				'start_time' => $row->start_time,
 				'end_time' => $row->end_time,
-				'total_minute' => (empty($row->total_minute)) ? "":number_format($row->total_minute),
-				'ok_qty' => (empty($row->ok_qty)) ? "":number_format($row->ok_qty),
-				'ng_qty' => (empty($row->ng_qty)) ? "":number_format($row->ng_qty),
-				'total_break' => (empty($row->total_break)) ? "":number_format($row->total_break),
+				'total_minute' => (empty($row->total_minute)) ? "0":number_format($row->total_minute),
+				'total_break' => (empty($row->total_break)) ? "0":number_format($row->total_break),
+				'ok_qty' => (empty($row->ok_qty)) ? "0":number_format($row->ok_qty),
+				'ng_qty' => (empty($row->ng_qty)) ? "0":number_format($row->ng_qty),
+				'wip_qty' => (empty($row->wip_qty)) ? "0":number_format($row->wip_qty),
+				'setup' => (empty($row->setup)) ? "0":number_format($row->setup),
+				'dt' => (empty($row->dt)) ? "0":number_format($row->dt),
 				'first_serial_no' => $row->first_serial_no,
 				'last_serial_no' => $row->last_serial_no
 			);
 		}
-		/*
-		echo "<pre>";
+		/*echo "<pre>";
 		print_r($data);
-		echo "</pre>";
-		*/
+		echo "</pre>";*/
 		Excel::create('ProcessLogs', function($excel) use($data) {
 			$excel->sheet('Sheet 1', function($sheet) use($data) {
 				$sheet->fromArray($data);
 				$sheet->row(1, array(
-					'ID', 'User', 'Line', 'Process number', 'Process title', 'Model', 'Lot', 'Leader', 'Start time', 'End time', 'Total minute', 'OK Qty', 'NG Qty', 'Total Break', 'First S/N', 'Last S/N'
+					'ID', 'User', 'Line', 'Process number', 'Process title', 'Model', 'Working date', 'Shift', 'Lot', 'Leader', 'Start time', 'End time', 'Total minute', 'Total break', 'OK Qty', 'NG Qty', 'WIP Qty', 'Setup', 'D/T', 'First S/N', 'Last S/N'
 				));
 				$sheet->row(1, function($row) {
 					$row->setFontWeight('bold');
