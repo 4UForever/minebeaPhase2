@@ -440,6 +440,7 @@
 @apiParam {Number} setup Setup value
 @apiParam {Number} dt D/T value
 @apiParam {String} remark Remark if some of NG2 more than NG1 (optional)
+@apiParam {Number} wip_qty WIP quantity if working in last lot of this shift (optional)
 @apiParam {String} ngs List of NG (JSON string format)
 @apiParam {String} breaks List of break (JSON string format)
 @apiParamExample {json} ngs-Example:
@@ -504,6 +505,68 @@
             "created_at": "2017-09-11 15:36:17",
             "updated_at": "2017-09-11 17:09:28",
             "remark": null
+        }
+    }
+}
+*/
+
+/**
+@api {post} /process/check-input-lot Post check input lot
+@apiVersion 0.1.0
+@apiDescription Post check input lot
+@apiName PostCheckInput
+@apiGroup Process
+@apiParam {String} qr_code Users unique code
+@apiParam {String} parts List of input parts (JSON string format)
+@apiParam {String} wip_lots List of input wip lots (JSON string format)
+@apiSuccess {Array} process_log Array of process_log
+@apiSuccess {Array} lots Array of lot data available
+@apiSuccess {Array} lots.lot_data Array of lot data
+@apiSuccess {Array} lots.lot_data.first_serial_no First serial number
+@apiSuccess {Array} lots.lot_data.last_serial_no Last serial number
+@apiSuccessExample Example-Success-Response:
+{
+    "meta_data": {
+        "request_params": {
+            "qr_code": "kai02",
+            "wip_lots": "[]",
+            "parts": "[{\"number\":\"4011000525\",\"iqc_lots\":[]},{\"number\":\"4011000524\",\"iqc_lots\":[]}]"
+        },
+        "success": "Your request has been successfully received.",
+        "errors": null,
+        "next_page": null,
+        "previous_page": null
+    },
+    "data": {
+        "process_log": {
+            "id": 26,
+            "user_id": 217,
+            "user_email": "kai.s@excelbangkok.com",
+            "line_id": 3,
+            "line_title": "15VRX Line 3",
+            "model_id": 4,
+            "model_title": "15VRX1003C18S",
+            "process_id": 45,
+            "process_number": "3-1-210-220",
+            "process_title": "Apply varnish to Dryheat",
+            "wip_id": 1,
+            "wip_sort": 2
+        },
+        "lots": {
+            "input_lot_number": false,
+            "lot_data": [
+                {
+                    "id": 3,
+                    "wip_id": 1,
+                    "wip_title": "test",
+                    "number": "test1",
+                    "quantity": null,
+                    "created_at": "2017-09-13 09:54:55",
+                    "updated_at": "2017-09-13 09:54:55",
+                    "first_serial_no": "1",
+                    "last_serial_no": "3"
+                }
+            ]
         }
     }
 }

@@ -23,8 +23,8 @@ define({ "api": [
     "url": "",
     "version": "0.0.0",
     "filename": "./doc/main.js",
-    "group": "C__xampp_htdocs_Git_Minebea_V2_public_assets_doc_main_js",
-    "groupTitle": "C__xampp_htdocs_Git_Minebea_V2_public_assets_doc_main_js",
+    "group": "C__xampp_htdocs_Git_Minebea_V2_assets_doc_main_js",
+    "groupTitle": "C__xampp_htdocs_Git_Minebea_V2_assets_doc_main_js",
     "name": ""
   },
   {
@@ -190,6 +190,97 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/process/check-input-lot",
+    "title": "Post check input lot",
+    "version": "0.1.0",
+    "description": "<p>Post check input lot</p>",
+    "name": "PostCheckInput",
+    "group": "Process",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "qr_code",
+            "description": "<p>Users unique code</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "parts",
+            "description": "<p>List of input parts (JSON string format)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "wip_lots",
+            "description": "<p>List of input wip lots (JSON string format)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "process_log",
+            "description": "<p>Array of process_log</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "lots",
+            "description": "<p>Array of lot data available</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "lots.lot_data",
+            "description": "<p>Array of lot data</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "lots.lot_data.first_serial_no",
+            "description": "<p>First serial number</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "lots.lot_data.last_serial_no",
+            "description": "<p>Last serial number</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Example-Success-Response:",
+          "content": "{\n    \"meta_data\": {\n        \"request_params\": {\n            \"qr_code\": \"kai02\",\n            \"wip_lots\": \"[]\",\n            \"parts\": \"[{\\\"number\\\":\\\"4011000525\\\",\\\"iqc_lots\\\":[]},{\\\"number\\\":\\\"4011000524\\\",\\\"iqc_lots\\\":[]}]\"\n        },\n        \"success\": \"Your request has been successfully received.\",\n        \"errors\": null,\n        \"next_page\": null,\n        \"previous_page\": null\n    },\n    \"data\": {\n        \"process_log\": {\n            \"id\": 26,\n            \"user_id\": 217,\n            \"user_email\": \"kai.s@excelbangkok.com\",\n            \"line_id\": 3,\n            \"line_title\": \"15VRX Line 3\",\n            \"model_id\": 4,\n            \"model_title\": \"15VRX1003C18S\",\n            \"process_id\": 45,\n            \"process_number\": \"3-1-210-220\",\n            \"process_title\": \"Apply varnish to Dryheat\",\n            \"wip_id\": 1,\n            \"wip_sort\": 2\n        },\n        \"lots\": {\n            \"input_lot_number\": false,\n            \"lot_data\": [\n                {\n                    \"id\": 3,\n                    \"wip_id\": 1,\n                    \"wip_title\": \"test\",\n                    \"number\": \"test1\",\n                    \"quantity\": null,\n                    \"created_at\": \"2017-09-13 09:54:55\",\n                    \"updated_at\": \"2017-09-13 09:54:55\",\n                    \"first_serial_no\": \"1\",\n                    \"last_serial_no\": \"3\"\n                }\n            ]\n        }\n    }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./example.js",
+    "groupTitle": "Process",
+    "sampleRequest": [
+      {
+        "url": "http://dev-minebea.devsenses.net/api/process/check-input-lot"
+      }
+    ]
+  },
+  {
+    "type": "post",
     "url": "/process/process-finish",
     "title": "Finish process",
     "version": "0.1.0",
@@ -254,6 +345,13 @@ define({ "api": [
             "optional": false,
             "field": "remark",
             "description": "<p>Remark if some of NG2 more than NG1 (optional)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "wip_qty",
+            "description": "<p>WIP quantity if working in last lot of this shift (optional)</p>"
           },
           {
             "group": "Parameter",
