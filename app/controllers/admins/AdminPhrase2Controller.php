@@ -394,7 +394,4 @@ class AdminPhrase2Controller extends AdminBaseController
 		}
 	}
 
-	public function reportDaily(){
-		return View::make('admins.reports.daily');
-	}
 }

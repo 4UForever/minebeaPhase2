@@ -74,7 +74,7 @@ $(document).ready(function() {
       alert("Please select at least one record.");
     } else {
       var role = $(this).attr('data-role');
-      var url = "/admin/process-log/export-"+role+"?rows="+rows;
+      var url = "process-log/export-"+role+"?rows="+rows;
       location.href = url;
     }
   });

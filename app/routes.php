@@ -305,7 +305,8 @@ Route::group(array('prefix' => 'admin'), function() {
     Route::post('import-target', 'AdminPhrase2Controller@postImportTarget');
     Route::post('import-target-table', 'AdminPhrase2Controller@getDataTarget');
 
-    Route::get('report-daily', 'AdminPhrase2Controller@reportDaily');
+    Route::get('report-daily', 'AdminReportController@reportDaily');
+    Route::get('report-ajax-select', 'AdminReportController@reportAjax');
   });
   Route::group(array('before' => 'auth.has_access:manage_process_work'), function() {
     Route::get('process-working', 'AdminProcessWorking@getIndex');
