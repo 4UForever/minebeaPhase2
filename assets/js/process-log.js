@@ -74,7 +74,10 @@ $(document).ready(function() {
       alert("Please select at least one record.");
     } else {
       var role = $(this).attr('data-role');
-      var url = "process-log/export-"+role+"?rows="+rows;
+      var fullUrl = window.location.href;
+      var index = fullUrl.lastIndexOf("/");
+      var urlPath = fullUrl.substring(0, index)+"/";
+      var url = urlPath+"process-log/export-"+role+"?rows="+rows;
       location.href = url;
     }
   });

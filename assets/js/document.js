@@ -14,7 +14,10 @@ $(document).ready(function() {
     $(self).parents('.col-xs-2').siblings('.col-xs-4').children('.ajax-loader').show();
     $('.model-process-add-more').attr('disabled', 'disabled');
 
-    var url = '/admin/document/get-model-processes';
+    var fullUrl = window.location.href;
+    var index = fullUrl.lastIndexOf("/");
+    var urlPath = fullUrl.substring(0, index)+"/";
+    var url = urlPath+'document/get-model-processes';
 
     var data = {
       'id': $(self).parents('.row').attr('data-id'),
@@ -53,7 +56,10 @@ $(document).ready(function() {
     $(self).hide();
     $(self).siblings('.ajax-loader').show();
 
-    var url = '/admin/document/get-model-processes-pair';
+    var fullUrl = window.location.href;
+    var index = fullUrl.lastIndexOf("/");
+    var urlPath = fullUrl.substring(0, index)+"/";
+    var url = urlPath+'document/get-model-processes-pair';
 
     $.post(url, function(response) {
       $(self).siblings('.ajax-loader').hide();

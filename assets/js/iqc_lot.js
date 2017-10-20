@@ -64,7 +64,10 @@ $(document).ready(function() {
     if(rows==""){
       alert("Please select at least one record.");
     } else {
-      var url = "/admin/iqc-lot/delete-multi?rows="+rows;
+      var fullUrl = window.location.href;
+      var index = fullUrl.lastIndexOf("/");
+      var urlPath = fullUrl.substring(0, index)+"/";
+      var url = urlPath+"iqc-lot/delete-multi?rows="+rows;
       location.href = url;
     }
   });

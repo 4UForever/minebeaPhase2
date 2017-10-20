@@ -44,9 +44,12 @@ $(document).ready(function() {
   $('#line_id').change(function(){
     console.log("change law");
     var params = "line_id="+$(this).val();
+    var fullUrl = window.location.href;
+    var index = fullUrl.lastIndexOf("/");
+    var urlPath = fullUrl.substring(0, index)+"/";
     $.ajax({
       type: "GET",
-      url: "/admin/lot/product-select",
+      url: urlPath+"lot/product-select",
       dataType: "html",
       data: params,
       cache: false,
@@ -57,7 +60,7 @@ $(document).ready(function() {
 
     $.ajax({
       type: "GET",
-      url: "/admin/lot/process-select",
+      url: urlPath+"lot/process-select",
       dataType: "html",
       data: params,
       cache: false,
