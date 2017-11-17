@@ -20,7 +20,8 @@ class ImportTarget extends Ardent {
     // 'process_number',
     // 'process_title',
     'target_pc',
-    'stock_pc'
+    'stock_pc',
+    'stock_pro'
   );
 
   protected $guarded  = array();

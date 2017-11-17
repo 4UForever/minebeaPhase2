@@ -36,6 +36,11 @@ $(document).ready(function(){
       $('#line_id').html(res);
     });
   });
+  $('.btn-export').click(function(){
+    var url = '{{url("admin/report-daily")}}?'+$(this).closest("form").serialize()+'&type=excel';
+    // console.log('url=', url);
+    window.location.href = url;
+  });
 });
 </script>
 @stop
@@ -81,8 +86,9 @@ $(document).ready(function(){
         </div>
       </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
       <button type="submit" class="btn btn-success">View Report</button>
+      <button type="button" class="btn btn-success btn-export"><span class="glyphicon glyphicon-export"></span> Export Report</button>
     </div>
     <!-- <div class="col-md-2">
       <button type="submit" class="btn btn-success">View Report</button>
@@ -93,6 +99,7 @@ $(document).ready(function(){
   <div class="col-md-12">
     <div class="table-responsive">
       <table class="table table-bordered table-hover">
+          <col width="500">
           <thead>
             <tr>
               <th rowspan="2">Process name</th>
@@ -104,6 +111,7 @@ $(document).ready(function(){
               <th rowspan="2">Yield NG(%)</th>
               <th rowspan="2">Yield Accum(%)</th>
               <th rowspan="2">BAL PC</th>
+              <th rowspan="2">WIP</th>
               <th rowspan="2">Stock PRO</th>
               <th rowspan="2">Stock PC<br></th>
               <th rowspan="2">BAL Stock</th>
@@ -146,20 +154,20 @@ $(document).ready(function(){
             <tr>
               <td>Total cycle time</td>
               <td>{{ $total['cycle_time'] }}</td>
-              <td colspan="2">Man Power</td>
-              <td>xx</td>
+              <!-- <td colspan="2">Man Power</td>
+              <td>{{ $total['man_power'] }}</td>
               <td>Productivity 100%</td>
-              <td>xx</td>
+              <td>{{ $total['prod_100'] }}</td>
               <td>Productivity 80%</td>
-              <td>-</td>
-              <td colspan="{{ ($resShiftSize+3) }}"></td>
+              <td>{{ $total['prod_80'] }}</td> -->
+              <td colspan="{{ ($resShiftSize+11) }}"></td>
               <td colspan="4">NG / Day</td>
               <td>{{ $total['day_ttl'] }}</td>
               <td>{{ $total['day_price'] }}</td>
               <td colspan="3"></td>
             </tr>
             <tr>
-              <td colspan="{{ ($resShiftSize+12) }}"></td>
+              <td colspan="{{ ($resShiftSize+13) }}"></td>
               <td colspan="4">Accum NG</td>
               <td>{{ $total['accum_ttl'] }}</td>
               <td>{{ $total['accum_price'] }}</td>

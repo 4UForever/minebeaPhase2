@@ -109,11 +109,13 @@ class AdminPhrase2Controller extends AdminBaseController
 		$lines = Line::all();
 		$total_false = 0;
 		foreach($lines as $line){
-			$res[$line->id] = $this->validatePriceByLineId($file_path, $line->id);
-			if($res[$line->id]['status']===FALSE){
-				$total_false++;
-				return Redirect::to("admin/import-price")->withErrors(array($res[$line->id]['message']));
-			}
+			// if($line->id=="6"){
+				$res[$line->id] = $this->validatePriceByLineId($file_path, $line->id);
+				if($res[$line->id]['status']===FALSE){
+					$total_false++;
+					return Redirect::to("admin/import-price")->withErrors(array($res[$line->id]['message']));
+				}
+			// }
 		}
 		if($total_false < 1){
 			foreach($lines as $line){
@@ -135,40 +137,42 @@ class AdminPhrase2Controller extends AdminBaseController
 				$reader->ignoreEmpty();
 			})->get();
 			foreach($result as $row=>$col){
-				$process_number = trim($col[0]);
-				$process_name = trim($col[1]);
-				$model = trim($col[2]);
-				$cycle_time = trim($col[3]);
-				$unit_price = trim($col[4]);
-				if(!empty($process_number) && !empty($model)){//ignore empty rows
-					$checkProcess = Process::where('number', $process_number)->first(array('id'));
-					if( empty($checkProcess) && $res['status']===TRUE ){
-						$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[0]." (Not found process number:".$process_number." in database)");
-					} else {
-						$data[$row]['process_id'] = $checkProcess->id;
-					}
-					$checkProduct = Product::where('title', $model)->first(array('id'));
-					if( empty($checkProduct) && $res['status']===TRUE ){
-						$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[2]." (Not found model title:".$model." in database)");
-					} else {
-						$data[$row]['product_id'] = $checkProduct->id;
-					}
-					if(!empty($cycle_time) && !is_numeric($cycle_time) && $res['status']===TRUE){
-						$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[3]." (cycle time is not numeric value)");
-					} else {
-						$data[$row]['cycle_time'] = empty($cycle_time)? "0":$cycle_time;
-					}
-					if(!empty($unit_price) && !is_numeric($unit_price) && $res['status']===TRUE){
-						$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[4]." (unit price ".$unit_price." is not numeric value)");
-					} else {
-						$data[$row]['unit_price'] = empty($unit_price)? "0":$unit_price;
+				if(!empty($col[0]) && !empty($col[1]) && !empty($col[2]) && !empty($col[3]) && !empty($col[4])){
+					$process_number = trim($col[0]);
+					$process_name = trim($col[1]);
+					$model = trim($col[2]);
+					$cycle_time = trim($col[3]);
+					$unit_price = trim($col[4]);
+					if(!empty($process_number) && !empty($model)){//ignore empty rows
+						$checkProcess = Process::where('number', $process_number)->first(array('id'));
+						if( empty($checkProcess) && $res['status']===TRUE ){
+							$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[0]." (Not found process number:".$process_number." in database)");
+						} else {
+							$data[$row]['process_id'] = $checkProcess->id;
+						}
+						$checkProduct = Product::where('title', $model)->first(array('id'));
+						if( empty($checkProduct) && $res['status']===TRUE ){
+							$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[2]." (Not found model title:".$model." in database)");
+						} else {
+							$data[$row]['product_id'] = $checkProduct->id;
+						}
+						if(!empty($cycle_time) && !is_numeric($cycle_time) && $res['status']===TRUE){
+							$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[3]." (cycle time is not numeric value)");
+						} else {
+							$data[$row]['cycle_time'] = empty($cycle_time)? "0":$cycle_time;
+						}
+						if(!empty($unit_price) && !is_numeric($unit_price) && $res['status']===TRUE){
+							$res = array("status"=>FALSE, "message"=>"Error in line:".$line_id.", row:".($row+2).", column:".$col_arr[4]." (unit price ".$unit_price." is not numeric value)");
+						} else {
+							$data[$row]['unit_price'] = empty($unit_price)? "0":$unit_price;
+						}
 					}
 				}
 			}
 			$res['data'] = $data;
-			// print_r($result);
 			return $res;
 		} catch (Exception $e) {
+			// echo $e->getMessage();
 			return $res;
 		}
 	}
