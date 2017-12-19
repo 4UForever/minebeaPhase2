@@ -423,6 +423,7 @@ Route::group(array('prefix' => 'api'), function() {
     Route::post('process/model-data', 'ApiPhase2Controller@modelData');//replaced
     Route::post('process/process-finish', 'ApiPhase2Controller@processFinish');//replaced
     Route::post('process/check-input-lot', 'ApiPhase2Controller@checkInputLot');//replaced
+    Route::get('process/get-continue-process', 'ApiPhase2Controller@getContinueProcess');
   });
 
   // -------------------------------------------------------------------------

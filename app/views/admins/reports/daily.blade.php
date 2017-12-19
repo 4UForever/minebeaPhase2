@@ -39,7 +39,15 @@ $(document).ready(function(){
   $('.btn-export').click(function(){
     var url = '{{url("admin/report-daily")}}?'+$(this).closest("form").serialize()+'&type=excel';
     // console.log('url=', url);
-    window.location.href = url;
+    if(!$("#date").val()){
+      alert('Please select date.');
+    } else if(!$("#model_id").val()){
+      alert('Please select model.');
+    } else if(!$("#model_id").val()){
+      alert('Please select line.');
+    } else {
+      window.location.href = url;
+    }
   });
 });
 </script>

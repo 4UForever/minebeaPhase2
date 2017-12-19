@@ -77,6 +77,7 @@
 @apiParam {Number} line_id Working line ID
 @apiParam {Number} model_id Working model ID
 @apiParam {Number} process_id Working process ID
+@apiParam {Number} process_log_from Process log from (In case continue working process. If not, add empty value)
 @apiSuccess {Array} process_log Array of process_log
 @apiSuccessExample Example-Success-Response:
 {
@@ -441,10 +442,11 @@
 @apiParam {Number} dt D/T value
 @apiParam {String} remark Remark if some of NG2 more than NG1 (optional)
 @apiParam {Number} wip_qty WIP quantity if working in last lot of this shift (optional)
+@apiParam {Boolean} is_continue Can be continue to another process-log (optional)
 @apiParam {String} ngs List of NG (JSON string format)
 @apiParam {String} breaks List of break (JSON string format)
 @apiParamExample {json} ngs-Example:
-[{"ng_id":"1","ng1":"5","ng2":"4"},{"ng_id":"2","ng1":"10","ng2":"5"}]
+[{"ng_id":"1","ng_serial":"x00101","ng1":true,"ng2":false},{"ng_id":"2","ng_serial":"x00102","ng1":true,"ng2":true}]
 @apiParamExample {json} breaks-Example:
 [{"break_id":"1","break_flag":"test break flag 1","start_break":"2017-09-08 10:10:00","end_break":"2017-09-08 10:20:00"},{"break_id":"5","break_flag":"test break flag 5","start_break":"2017-09-08 11:10:00","end_break":"2017-09-08 11:20:00"}]
 @apiSuccess {Array} process_log Array of process_log
@@ -569,5 +571,44 @@
             ]
         }
     }
+}
+*/
+
+/**
+@api {get} /process/get-continue-process Get continue process
+@apiVersion 0.1.0
+@apiDescription Get can continue process
+@apiName GetContinue
+@apiGroup Process
+@apiParam {String} qr_code Users unique code
+@apiSuccess {Array} process_log Array of process_log
+@apiSuccessExample Example-Success-Response:
+{
+    "meta_data": {
+        "request_params": {
+            "qr_code": "kai02"
+        },
+        "success": "Your request has successfully received.",
+        "errors": null,
+        "next_page": null,
+        "previous_page": null
+    },
+    "data": [
+        {
+            "process_log_from": 28,
+            "line_id": 6,
+            "line_title": "15VRX Line 6",
+            "product_id": 4,
+            "product_title": "15VRX1003C18S",
+            "process_id": 10,
+            "process_number": "6-1-120-165",
+            "process_title": "Assembly insulator 1 to Output from conveyer",
+            "wip_id": 2,
+            "wip_sort": 2,
+            "lot_id": 2,
+            "lot_number": "A2",
+            "line_leader": 6
+        }
+    ]
 }
 */
