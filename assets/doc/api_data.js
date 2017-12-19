@@ -78,6 +78,55 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/process/get-continue-process",
+    "title": "Get continue process",
+    "version": "0.1.0",
+    "description": "<p>Get can continue process</p>",
+    "name": "GetContinue",
+    "group": "Process",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "qr_code",
+            "description": "<p>Users unique code</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "process_log",
+            "description": "<p>Array of process_log</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Example-Success-Response:",
+          "content": "{\n    \"meta_data\": {\n        \"request_params\": {\n            \"qr_code\": \"kai02\"\n        },\n        \"success\": \"Your request has successfully received.\",\n        \"errors\": null,\n        \"next_page\": null,\n        \"previous_page\": null\n    },\n    \"data\": [\n        {\n            \"process_log_from\": 28,\n            \"line_id\": 6,\n            \"line_title\": \"15VRX Line 6\",\n            \"product_id\": 4,\n            \"product_title\": \"15VRX1003C18S\",\n            \"process_id\": 10,\n            \"process_number\": \"6-1-120-165\",\n            \"process_title\": \"Assembly insulator 1 to Output from conveyer\",\n            \"wip_id\": 2,\n            \"wip_sort\": 2,\n            \"lot_id\": 2,\n            \"lot_number\": \"A2\",\n            \"line_leader\": 6\n        }\n    ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./example.js",
+    "groupTitle": "Process",
+    "sampleRequest": [
+      {
+        "url": "http://dev-minebea.devsenses.net/api/process/get-continue-process"
+      }
+    ]
+  },
+  {
+    "type": "get",
     "url": "/process/ng-list",
     "title": "Get NG list",
     "version": "0.1.0",
@@ -355,6 +404,13 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "Boolean",
+            "optional": false,
+            "field": "is_continue",
+            "description": "<p>Can be continue to another process-log (optional)</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "String",
             "optional": false,
             "field": "ngs",
@@ -372,7 +428,7 @@ define({ "api": [
       "examples": [
         {
           "title": "ngs-Example:",
-          "content": "[{\"ng_id\":\"1\",\"ng1\":\"5\",\"ng2\":\"4\"},{\"ng_id\":\"2\",\"ng1\":\"10\",\"ng2\":\"5\"}]",
+          "content": "[{\"ng_id\":\"1\",\"ng_serial\":\"x00101\",\"ng1\":true,\"ng2\":false},{\"ng_id\":\"2\",\"ng_serial\":\"x00102\",\"ng1\":true,\"ng2\":true}]",
           "type": "json"
         },
         {
@@ -525,6 +581,13 @@ define({ "api": [
             "optional": false,
             "field": "process_id",
             "description": "<p>Working process ID</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "process_log_from",
+            "description": "<p>Process log from (In case continue working process. If not, add empty value)</p>"
           }
         ]
       }
