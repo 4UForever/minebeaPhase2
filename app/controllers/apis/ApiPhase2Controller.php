@@ -138,9 +138,28 @@ class ApiPhase2Controller extends ApiBaseController {
 
 		$arr_process_log = ProcessLog::where('id', $arr_user->on_process)->first(array('id', 'user_id', 'user_email', 'line_id', 'line_title', 'product_id as model_id', 'product_title as model_title', 'process_id', 'process_number', 'process_title', 'wip_id', 'wip_sort'));
 		$process_id = $arr_process_log->process_id;
+
+		$arr_lotto = DB::table('process_log_continues')->where('process_log_to', $arr_process_log->id)->first();
+		// print_r($arr_lotto);
 		if($arr_process_log->wip_sort == 1){
-			$input_lot_number = TRUE;
-			$lot_data = array();
+			if(empty($arr_lotto)){
+				$input_lot_number = TRUE;
+				$lot_data = array();
+			} else {
+				$input_lot_number = FALSE;
+				$find_log_from = ProcessLog::where('id', $arr_lotto->process_log_from)->first(array('lot_id', 'lot_number'));
+				$lot_data = Lot::where('id', $find_log_from->lot_id)
+					->whereNull('quantity')
+					->get();
+				// print_r($lot_data->toArray());
+				foreach($lot_data as $lot){
+					$find_log_id = DB::table('lot_process')->where('lot_id', $lot->id)->where('sort', '1')->pluck('process_log_id');
+					$find_process_log = ProcessLog::where('id', $find_log_id)->first(array('first_serial_no', 'last_serial_no'));
+					// echo "log_id=".$find_log_id." last sn=".$find_process_log->first_serial_no."<br>";
+					$lot->first_serial_no = (empty($find_process_log->first_serial_no))? "":strval($find_process_log->first_serial_no);
+					$lot->last_serial_no = (empty($find_process_log->last_serial_no))? "":strval($find_process_log->last_serial_no);
+				}
+			}
 		} else {
 			$input_lot_number = FALSE;
 			$lot_data = Lot::where('wip_id', $arr_process_log->wip_id)

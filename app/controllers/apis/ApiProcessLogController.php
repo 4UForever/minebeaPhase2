@@ -190,7 +190,8 @@ class ApiProcessLogController extends ApiBaseController {
 			//Create lot if sort==1
 			$lot_id = Input::get('lot_id');
 			$lot_number = Input::get('lot_number');
-			if($process_log->wip_sort == 1){
+			$arr_lotto = DB::table('process_log_continues')->where('process_log_to', $process_log->id)->first();
+			if( ($process_log->wip_sort==1) && empty($arr_lotto) ){
 				if(empty($lot_number)){
 					return Response::api("You must provide lot_number", 404);
 				}
