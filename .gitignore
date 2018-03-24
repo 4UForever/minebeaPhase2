@@ -11,3 +11,6 @@ composer.lock
 .env.php
 .DS_Store
 Thumbs.db
+
+/app/config/local/database.php
+/bootstrap/start.php
