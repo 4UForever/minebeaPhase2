@@ -172,6 +172,12 @@
                 <span class="glyphicon-class">Report daily</span>
               </a>
             </li>
+            <li>
+              <a {{Request::segment(2) == 'report-continue' ? 'class="active"' : ''}}  href="{{url("admin/clear-continue")}}">
+                <span class="glyphicon glyphicon-book"></span>
+                <span class="glyphicon-class">Clear Continue list</span>
+              </a>
+            </li>
           </ul>
         </div>
       </div>

@@ -106,27 +106,42 @@ class AdminLotController extends AdminBaseController
 	function getDelete($id){
 		$lot = Lot::find($id);
 
-		$lot_working = DB::table('lot_process')->where('lot_id', $id)->whereNotNull('process_log_id')->whereNull('qty')->first();
+		/*$lot_working = DB::table('lot_process')->where('lot_id', $id)->whereNotNull('process_log_id')->whereNull('qty')->first();
 		if(!empty($lot_working)){
 			return Redirect::to('admin/lot')->withErrors(array("Lot number ".$lot->number." is on working by process ID : ".$lot_working->process_id));
-		} else {
+		} else {*/
 			return View::make('admins.lots.delete', compact('lot'));
-		}
+		// }
 	}
 
 	function getDeleteConfirmed($id){
 		$lot = Lot::with('processes')->find($id);
-		//echo "<pre>";print_r($lot->processes->toArray());echo "</pre>";
-		$lot_working = DB::table('lot_process')->where('lot_id', $id)->whereNotNull('process_log_id')->whereNull('qty')->first();
+		// echo "<pre>";print_r($lot->processes->toArray());echo "</pre>";
+		if(count($lot->processes->toArray())>0){
+			$arr_process = [];
+			foreach($lot->processes as $p){
+				if(!empty($p->pivot->process_log_id)){
+					$arr_process[] = $p->pivot->process_log_id;
+				}
+			}
+			// print_r($arr_process);
+			DB::table('process_logs')->whereIn('id', $arr_process)->delete();
+			DB::table('process_log_breaks')->whereIn('process_log_id', $arr_process)->delete();
+			DB::table('process_log_inputs')->whereIn('process_log_id', $arr_process)->delete();
+			DB::table('process_log_ng1s')->whereIn('process_log_id', $arr_process)->delete();
+			DB::table('process_log_ngs')->whereIn('process_log_id', $arr_process)->delete();
+			DB::table('process_log_parts')->whereIn('process_log_id', $arr_process)->delete();
+		}
+		/*$lot_working = DB::table('lot_process')->where('lot_id', $id)->whereNotNull('process_log_id')->whereNull('qty')->first();
 		if(!empty($lot_working)){
 			return Redirect::to('admin/lot')->withErrors(array("Lot number ".$lot->number." is on working by process ID : ".$lot_working->process_id));
-		} else {
+		} else {*/
 			if ($lot->delete()) {
 				$process_ids = array_fetch($lot->processes->toArray(), "id");
 				$lot->processes()->detach($process_ids);
 			}
 			return Redirect::to("admin/lot")->with('success', "Successfully delete lot <i>{$lot->number}</i>");
-		}
+		/*}*/
 	}
 
 	public function getTest(){

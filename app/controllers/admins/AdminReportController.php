@@ -118,14 +118,25 @@ class AdminReportController extends AdminBaseController
 	}
 
 	public function reportDaily1(){//for test
-		$date = "2017-10-07";
+		$date = "2018-02-09";
 		$model_id = "7";
 		$line_id = "6";
-		// $process_id = "10";
+		$process_id = "9";
 		// $this->exportExcel();
 		$process_logs = $this->getAllProcessLog($date, $line_id, $model_id);
-		$process_date = $this->getProcessDate($process_logs, $date);
-		// echo "<pre>";print_r($process_date);echo "</pre>";
+		$processDate = $this->getProcessDate($process_logs, $date);
+		echo "<pre>";print_r($processDate);echo "</pre>";
+		$prevProcessKey = array_search($process_id, array_column($processDate, 'process_id'))-1;
+		if($prevProcessKey>=0){
+			$prevProcessId = $processDate[$prevProcessKey]['process_id'];
+			$prevWip = $this->getWip($process_logs, $date, $prevProcessId);
+		} else {
+			$prevWip = 0;
+		}
+		/*$filter = array_filter($process_date, function($item) use ($process_id){
+			return ($item['process_id']==$process_id);
+		});*/
+		echo "<pre>";print_r($prevWip);echo "</pre>";
 		/*foreach($process_date as $process_key=>$process_arr){
 			if($process_key==8){
 			$stock_pro = $this->getStockPro($process_logs, $date, $line_id, $model_id, $process_arr['process_id']);
@@ -379,7 +390,17 @@ class AdminReportController extends AdminBaseController
 			return (($item['working_date']==$date) &&
 			($item['process_id']==$process_id));
 		}));
-		$res = array_sum(array_column($filter, 'ok_qty'));
+		//fix output need to deduct by WIP previous process 24/03/2018
+		$processDate = $this->getProcessDate($process_logs, $date);
+		$prevProcessKey = array_search($process_id, array_column($processDate, 'process_id'))-1;
+		if($prevProcessKey>=0){
+			$prevProcessId = $processDate[$prevProcessKey]['process_id'];
+			$prevWip = $this->getWip($process_logs, $date, $prevProcessId);
+		} else {
+			$prevWip = 0;
+		}
+		$res = array_sum(array_column($filter, 'ok_qty')) - $prevWip;
+		//-- fixed
 		return $res;
 	}
 

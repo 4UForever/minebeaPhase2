@@ -38,7 +38,7 @@ Route::get('/updateapp', function() {
 // Admin routes
 
 Route::group(array('prefix' => 'admin'), function() {
-
+  Route::get('/clear-continue', 'AdminClearLogController@clearContinue');
   // ---------------------------------------------------------------------------
   // Unprotected routes
 

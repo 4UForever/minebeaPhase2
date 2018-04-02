@@ -365,9 +365,11 @@ class ApiPhase2Controller extends ApiBaseController {
 			if(!$lot){
 				return Response::api("This process does not have lot.", 404);
 			}
-			$lot_process_count = $lot->processes->count();
-			if($lot_process_count > 0){
-				return Response::api("Your process order is ".$wip_sort.", There are ".$lot_process_count." processes less your order are running. You can break or contact administrator.", 404);
+			if(strtoupper($is_continue)!="TRUE"){
+				$lot_process_count = $lot->processes->count();
+				if($lot_process_count > 0){
+					return Response::api("Your process order is ".$wip_sort.", There are ".$lot_process_count." processes less your order are running. You can break or contact administrator.", 404);
+				}
 			}
 
 			if(is_array($ngs_arr) && is_array($breaks_arr)){
