@@ -173,9 +173,9 @@
               </a>
             </li>
             <li>
-              <a {{Request::segment(2) == 'report-continue' ? 'class="active"' : ''}}  href="{{url("admin/clear-continue")}}">
-                <span class="glyphicon glyphicon-book"></span>
-                <span class="glyphicon-class">Clear Continue list</span>
+              <a {{Request::segment(2) == 'utility' ? 'class="active"' : ''}}  href="{{url("admin/utility")}}">
+                <span class="glyphicon glyphicon-th"></span>
+                <span class="glyphicon-class">Utility</span>
               </a>
             </li>
           </ul>

@@ -38,7 +38,10 @@ Route::get('/updateapp', function() {
 // Admin routes
 
 Route::group(array('prefix' => 'admin'), function() {
-  Route::get('/clear-continue', 'AdminClearLogController@clearContinue');
+  Route::get('utility', 'AdminUtilityController@index');
+  Route::get('utility/ajax-stkpro', 'AdminUtilityController@getAjax');
+  Route::get('utility/ajax-clear-continue', 'AdminUtilityController@clearContinue');
+  Route::get('utility/ajax-reset-stkpro', 'AdminUtilityController@resetStockPro');
   // ---------------------------------------------------------------------------
   // Unprotected routes
 

@@ -118,46 +118,46 @@ class AdminReportController extends AdminBaseController
 	}
 
 	public function reportDaily1(){//for test
-		$date = "2018-02-09";
-		$model_id = "7";
+		$date = "2018-04-30";
+		$model_id = "4";
 		$line_id = "6";
-		$process_id = "9";
+		$process_id = "12";
 		// $this->exportExcel();
 		$process_logs = $this->getAllProcessLog($date, $line_id, $model_id);
 		$processDate = $this->getProcessDate($process_logs, $date);
-		echo "<pre>";print_r($processDate);echo "</pre>";
-		$prevProcessKey = array_search($process_id, array_column($processDate, 'process_id'))-1;
-		if($prevProcessKey>=0){
-			$prevProcessId = $processDate[$prevProcessKey]['process_id'];
-			$prevWip = $this->getWip($process_logs, $date, $prevProcessId);
-		} else {
-			$prevWip = 0;
-		}
-		/*$filter = array_filter($process_date, function($item) use ($process_id){
-			return ($item['process_id']==$process_id);
-		});*/
-		echo "<pre>";print_r($prevWip);echo "</pre>";
-		/*foreach($process_date as $process_key=>$process_arr){
-			if($process_key==8){
-			$stock_pro = $this->getStockPro($process_logs, $date, $line_id, $model_id, $process_arr['process_id']);
-			echo "id=".$process_arr['process_id']." pro=".$stock_pro."<br>";
-			}
-		}*/
+		echo "start<br>";
+		$stock_pro = $this->getStockPro($process_logs, $date, $line_id, $model_id, $process_id);
+		print_r($stock_pro);
+		// echo "<pre>";print_r($process_logs);echo "</pre>";
 		//SELECT * FROM `process_log_breaks` WHERE process_log_id in (SELECT id FROM `process_logs` WHERE working_date='2017-10-06' and line_id='6' and product_id='7') and break_id in (SELECT id FROM break_reasons WHERE flag='1')
 		echo "finish";
 	}
 
 	function getStockPro($process_logs, $date, $line_id, $model_id, $process_id){
-		$output = $this->getOutput($process_logs, $date, $process_id);
-		$last_stock_pro = $this->getLastStockPro($date, $line_id, $model_id, $process_id);
-		//find input next process
-		$processDate = $this->getProcessDate($process_logs, $date);
-		$nextProcessKey = array_search($process_id, array_column($processDate, 'process_id'))+1;
-		if($nextProcessKey < (count($processDate)-1) ){
-			$nextProcessId = $processDate[$nextProcessKey]['process_id'];
-			$stock_pro = ($output + $last_stock_pro) - $this->getInput($process_logs, $date, $nextProcessId);
+		$res = ImportTarget::where('line_id', $line_id)
+					->where('product_id', $model_id)
+					->where('process_id', $process_id)
+					->where('year', substr($date, 0, 4))
+					->where('month', substr($date, 5, 2))
+					->where('day', substr($date, 8, 2))
+					->whereNotNull('stock_pro')
+					->get();
+		if($res->count()>0){
+			$stock_pro = $res[0]->stock_pro;
 		} else {
-			$stock_pro = 0;
+			$output = $this->getOutput($process_logs, $date, $process_id);
+			$last_stock_pro = $this->getLastStockPro($date, $line_id, $model_id, $process_id);
+			//find input next process
+			$processDate = $this->getProcessDate($process_logs, $date);
+			$nextProcessKey = array_search($process_id, array_column($processDate, 'process_id'))+1;
+			if(count($processDate)<1){
+				$stock_pro = $last_stock_pro;
+			} else if($nextProcessKey < (count($processDate)-1) ){
+				$nextProcessId = $processDate[$nextProcessKey]['process_id'];
+				$stock_pro = ($output + $last_stock_pro) - $this->getInput($process_logs, $date, $nextProcessId);
+			} else {
+				$stock_pro = 0;
+			}
 		}
 		return $stock_pro;
 	}
@@ -185,7 +185,7 @@ class AdminReportController extends AdminBaseController
 		if($select->stock_pro === NULL){
 			$startDate = date("Y-m-d", strtotime("-1 month", strtotime($date)) );
 			$res = ImportTarget::selectRaw('CONCAT(year, "-", month, "-", day) as stockDate, stock_pro, year, month, day')
-							->whereRaw('CONCAT(year, "-", month, "-", day) between ? and ?', array($startDate, $date))
+							->whereRaw('CONCAT(year, "-", month, "-", day) between ? and ?', array($startDate, $lastDate))
 							->whereRaw('stock_pro is not NULL')
 							->where('line_id', $line_id)
 							->where('product_id', $model_id)
@@ -198,9 +198,11 @@ class AdminReportController extends AdminBaseController
 				return $select->stock_pro;
 			} else {
 				$setDate = date("Y-m-d", strtotime($res->stockDate));
+				$last_stock_pro = $res->stock_pro;
 				while( strtotime($setDate) < strtotime($lastDate) ){
 					$setDate = date("Y-m-d", strtotime("+1 day", strtotime($setDate)) );
-					$stock_pro = $this->setStockPro($setDate, $line_id, $model_id, $process_id, $res->stock_pro);
+					$stock_pro = $this->setStockPro($setDate, $line_id, $model_id, $process_id, $last_stock_pro);
+					$last_stock_pro = $stock_pro;
 				}
 				return $stock_pro;
 			}
@@ -220,7 +222,9 @@ class AdminReportController extends AdminBaseController
 		//find input next process
 		$processDate = $this->getProcessDate($process_logs, $date);
 		$nextProcessKey = array_search($process_id, array_column($processDate, 'process_id'))+1;
-		if($nextProcessKey < (count($processDate)-1) ){
+		if(count($processDate)<1){
+			$stock_pro = $last_stock_pro;
+		} else if($nextProcessKey < (count($processDate)-1)){
 			$nextProcessId = $processDate[$nextProcessKey]['process_id'];
 			$stock_pro = ($output + $last_stock_pro) - $this->getInput($process_logs, $date, $nextProcessId);
 		} else {
@@ -232,6 +236,7 @@ class AdminReportController extends AdminBaseController
 						->where('year', substr($date, 0, 4))
 						->where('month', substr($date, 5, 2))
 						->where('day', substr($date, 8, 2))
+						->whereNull('stock_pro')
 						->update(array('stock_pro'=>$stock_pro));
 		return $stock_pro;
 	}
@@ -344,7 +349,7 @@ class AdminReportController extends AdminBaseController
 	function getWorkingDay($process_logs, $date, $line_id, $model_id, $process_id){
 		$working_date = array();
 		foreach($process_logs as $key=>$val){
-			if( ($val['working_date']==$date) && ($val['line_id']==$line_id) && ($val['product_id']==$model_id) && ($val['process_id']==$process_id) ){
+			if( (strtotime($val['working_date'])<=strtotime($date)) && ($val['line_id']==$line_id) && ($val['product_id']==$model_id) && ($val['process_id']==$process_id) ){
 				if(!in_array($val['working_date'], $working_date)){
 					array_push($working_date, $val['working_date']);
 				}
