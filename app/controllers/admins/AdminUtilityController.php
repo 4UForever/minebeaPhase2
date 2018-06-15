@@ -127,11 +127,12 @@ class AdminUtilityController extends AdminBaseController {
 			$msg = "Please select Process ID";
 			return Response::json(['error'=>$error, 'msg'=>$msg]);
 		}
-		if(!intval($stock_pro)){
+		if(!is_numeric($stock_pro)){
 			$error = 1;
 			$msg = "Please input stock pro value in integer";
 			return Response::json(['error'=>$error, 'msg'=>$msg]);
 		}
+		// return Response::json(['error'=>1, 'msg'=>'test error']);
 		$res = ImportTarget::where('line_id', $line_id)
 					->where('product_id', $model_id)
 					->where('process_id', $process_id)

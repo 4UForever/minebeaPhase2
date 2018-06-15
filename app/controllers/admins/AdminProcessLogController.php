@@ -274,6 +274,7 @@ class AdminProcessLogController extends AdminBaseController
 				'process_log_id' => $row->process_log_id,
 				'ng_id' => $row->id,
 				'ng_title' => $row->ng_title,
+				'ng_serial' => $row->ng_serial,
 				'quantity' => $row->quantity
 			);
 		}
@@ -284,7 +285,7 @@ class AdminProcessLogController extends AdminBaseController
 			$excel->sheet('Sheet 1', function($sheet) use($data) {
 				$sheet->fromArray($data);
 				$sheet->row(1, array(
-					'Lot', 'Start time', 'End time', 'Process number', 'Process title', 'Process log ID', 'NG ID', 'NG Title', 'Quantity'
+					'Lot', 'Start time', 'End time', 'Process number', 'Process title', 'Process log ID', 'NG ID', 'NG Title', 'NG Serial', 'Quantity'
 				));
 				$sheet->row(1, function($row) {
 					$row->setFontWeight('bold');
