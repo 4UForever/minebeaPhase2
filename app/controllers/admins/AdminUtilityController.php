@@ -186,6 +186,7 @@ class AdminUtilityController extends AdminBaseController {
 				$msg .= "Date : ".$setDate." calculate new stock pro => ".$stock_pro."<br>";
 				$last_stock_pro = $stock_pro;
 			}
+			$msg .= "Process successfully.";
 			return Response::json(['error'=>$error, 'msg'=>$msg]);
 		}
 	}
@@ -274,6 +275,14 @@ class AdminUtilityController extends AdminBaseController {
 		$sumNg = array_sum(array_column($filter, 'ng_qty'));
 		$res = $sumOk + $sumNg;
 		return $res;
+	}
+
+	function getWip($process_logs, $date, $process_id){
+		$filter = array_values(array_filter($process_logs, function($item) use ($date, $process_id){
+			return (($item['working_date']==$date) && ($item['process_id']==$process_id));
+		}));
+		$sumWip = array_sum(array_column($filter, 'wip_qty'));
+		return $sumWip;
 	}
 	//***************--------copy from AdminReportController-------*****************
 
