@@ -376,7 +376,10 @@ class AdminReportController extends AdminBaseController
 		}));
 		$sumOk = array_sum(array_column($filter, 'ok_qty'));
 		$sumNg = array_sum(array_column($filter, 'ng_qty'));
-		$res = $sumOk + $sumNg;
+		$sumWip = array_sum(array_column($filter, 'wip_qty'));
+		$sumSetup = array_sum(array_column($filter, 'setup'));
+		$sumDt = array_sum(array_column($filter, 'dt'));
+		$res = $sumOk + $sumNg + $sumWip + $sumSetup + $sumDt;
 		return $res;
 	}
 
